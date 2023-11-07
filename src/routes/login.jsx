@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 const Login = () => {
   return (
-    <div className="">
+    <div className="w-screen flex items-center justify-center bg-red-600" >
       <Card>
         <CardHeader>
           <CardTitle>Login</CardTitle>
