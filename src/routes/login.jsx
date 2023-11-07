@@ -1,12 +1,15 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod";
+import { useCallback } from "react";
 
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useCallback } from "react";
+
+import {useAuth} from "@/components/auth-provider";
+import { useToast } from "@/components/ui/use-toast";
 
 const formScheme = z.object({
   email: z.string().email({ message: "Please enter a valid email"}),
@@ -14,6 +17,9 @@ const formScheme = z.object({
 });
 
 const Login = () => {
+  const {toast} = useToast();
+  const {login} = useAuth();
+
   const form = useForm({
     resolver: zodResolver(formScheme),
     defaultValues: {
@@ -22,8 +28,14 @@ const Login = () => {
     }
   });
 
-  const onSubmit = useCallback((data) => {
-    console.log(data);
+  const onSubmit = useCallback(async (data) => {
+    try {
+      await login(data);
+      toast({title: "Login success"});
+    } catch (e) {
+      console.error(e);
+      toast({title: "Login failed", variant: "destructive"});
+    }
   }, []);
 
   return (
