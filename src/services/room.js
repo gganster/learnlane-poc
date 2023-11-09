@@ -1,6 +1,6 @@
 import {doc, getDoc, addDoc, collection, onSnapshot, query, where} from "./firebase";
 
-export const createRoom = async ({title, description, userId}) => {
+export const createRoom = async ({title, description, locked = false, userId}) => {
   await addDoc(collection("rooms"), {
     title,
     description,
