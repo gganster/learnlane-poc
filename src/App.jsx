@@ -16,6 +16,7 @@ import DashboardLayout from "./routes/dashboard/layout";
 
 import Login from "./routes/login.jsx";
 import DashboardHome from "./routes/dashboard/home.jsx";
+import Room from "./routes/dashboard/room/room[id]";
 
 const router = createBrowserRouter([
   { path: "/", element: <AutologinRoute><Login /></AutologinRoute> },
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/dashboard", element: <DashboardHome /> },
       { path: "/dashboard/profile", element: <div>Profile</div> },
+      { path: "/dashboard/rooms/:id", element: <Room />}
     ]
   },
 ]);

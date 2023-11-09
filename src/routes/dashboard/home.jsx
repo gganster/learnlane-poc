@@ -1,11 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Trash } from "lucide-react";
-import { CheckSquare } from "lucide-react";
 import { ListTodo } from "lucide-react";
-import { LayoutList } from "lucide-react";
 import { UserIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const roomFakeData = [
   {
@@ -64,7 +61,8 @@ const DashboardHome = () => {
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {roomFakeData.map((room) => (
-              <Card key={room.id} className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-900">
+              <Link key={room.id} to={`/dashboard/rooms/${room.id}`}>
+              <Card  className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-900">
                 <CardHeader className="relative">
                   <CardTitle>{room.name}</CardTitle>
                   <CardDescription>{room.description}</CardDescription>
@@ -82,6 +80,7 @@ const DashboardHome = () => {
                   </div>
                 </CardContent>
               </Card>
+              </Link>
             ))}
           </div>
         </CardContent>
