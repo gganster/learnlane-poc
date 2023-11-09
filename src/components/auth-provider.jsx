@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState} from "react";
 import {signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-import {auth as FbAuth, db} from "@/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import {auth as FbAuth} from "@/firebase";
+import { getUserById } from "@/services/user";
 
 const initialState = {
   loading: true,
@@ -28,10 +28,10 @@ export const AuthProvider = ({children}) => {
     const subscribe = onAuthStateChanged(FbAuth, async (user) => {
       if (!user) return setAuth({initialState, loading: false});
       
-      const userData = await getDoc(doc(db, "users", user.uid));
-      if (!userData.exists()) return setAuth(initialState);
+      const userData = await getUserById(user.uid);
+      if (!userData) return setAuth(initialState);
 
-      setAuth({isConnected: true, user: {...user, ...userData.data()}, loading: false});
+      setAuth({isConnected: true, user: {...user, ...userData}, loading: false});
       console.log("connected as", user.email, ` (${user.uid})`);
     });
 
