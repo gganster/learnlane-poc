@@ -7,7 +7,7 @@ import Settings from "./_settings";
 const Room = () => {
   return (
     <>
-      <Tabs defaultValue="tasks" className="w-[400px]">
+      <Tabs defaultValue="tasks" className="w-full">
         <TabsList>
           <TabsTrigger value="tasks">tasks</TabsTrigger>
           <TabsTrigger value="participants">participants</TabsTrigger>

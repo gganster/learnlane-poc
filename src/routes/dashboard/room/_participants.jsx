@@ -13,9 +13,9 @@ import { Separator } from "@/components/ui/separator";
 const mock = [{id: 1, name: "User 1"}, {id: 2, name: "User 2"}]
 
 const Participants = (props) => (
-  <div className="w-screen">
+  <div className="w-full">
     <div className="flex justify-center">
-      <Table className="">
+      <Table className="flex-1 w-full">
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">id</TableHead>
