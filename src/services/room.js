@@ -1,4 +1,4 @@
-import {doc, getDoc, addDoc, collection, onSnapshot, query, where} from "./firebase";
+import {doc, getDoc, addDoc, collection, onSnapshot, query, where, setDoc, deleteDoc} from "./firebase";
 
 export const createRoom = async ({title, description, locked = false, userId}) => {
   await addDoc(collection("rooms"), {
@@ -17,20 +17,26 @@ export const getRoomsByUserIdRealtime = (userId, callback) => {
   })
 }
 
-
 export const getRoomById = async (id) => {
   const roomDoc = await getDoc(doc("rooms", id));
   if (!roomDoc.exists()) return null;
   return {id: roomDoc.id, ...roomDoc.data()};
 }
 
-export const updateRoom = async ({id, title}) => {
-  await doc("rooms", id).update({
-    title,
+export const getRoomByIdRealTime = (id, callback) => {
+  return onSnapshot(doc("rooms", id), (doc) => {
+    if (!doc.exists()) return null;
+    callback({id: doc.id, ...doc.data()});
+  })
+}
+
+export const updateRoom = async ({id, data}) => {
+  await setDoc(doc("rooms", id), {
+    ...data,
     updatedAt: new Date(),
   });
 }
 
 export const deleteRoom = async (id) => {
-  await doc("rooms", id).delete();
+  await deleteDoc(doc("rooms", id));
 }

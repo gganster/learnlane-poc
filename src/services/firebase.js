@@ -5,6 +5,7 @@ import {
   getDoc       as fgetDoc,
   setDoc       as fsetDoc,
   addDoc       as faddDoc,
+  deleteDoc    as fdeleteDoc,
   onSnapshot   as fonSnapshot,
   where        as fwhere,
   orderBy      as forderBy,
@@ -16,6 +17,7 @@ export const doc = (...args) => fdoc(db, ...args);
 export const setDoc = (...args) => fsetDoc(...args);
 export const getDoc = (...args) => fgetDoc(...args);
 export const addDoc = (...args) => faddDoc(...args);
+export const deleteDoc = (...args) => fdeleteDoc(...args);
 
 export const collection = (...args) => fcollection(db, ...args);
 export const onSnapshot = (...args) => fonSnapshot(...args);

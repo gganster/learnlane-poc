@@ -1,4 +1,6 @@
 
+import { useEffect, useCallback } from "react";
+
 import {Button} from "@/components/ui/button";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
@@ -6,11 +8,14 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { FormField, Form, FormControl, FormDescription, FormMessage, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/components/ui/use-toast";
 
+import { useRoom } from "@/components/room-provider";
 import * as z from "zod";
 import {useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback } from "react";
+import { deleteRoom, updateRoom } from "@/services/room";
+import { useNavigate } from "react-router-dom";
 
 const createFormScheme = z.object({
   title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
@@ -19,6 +24,10 @@ const createFormScheme = z.object({
 });
 
 const Settings = (props) => {
+  const {state} = useRoom();
+  const {toast} = useToast();
+  const navigate = useNavigate();
+
   const form = useForm({
     resolver: zodResolver(createFormScheme),
     defaultValues: {
@@ -28,8 +37,47 @@ const Settings = (props) => {
     }
   });
 
-  const onSubmit = useCallback(async (data) => {
+  useEffect(() => {
+    if (!state.room) return;
 
+    form.reset({
+      title: state.room.title,
+      description: state.room.description,
+      locked: state.room.locked,
+    });
+  }, []);
+
+  const onSubmit = useCallback(async (data) => {
+    try {
+      await updateRoom({id: state.room.id, data});
+      toast({
+        title: "Room updated",
+        variant: "success"
+      });
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: "Error happened",
+        variant: "destructive"
+      })
+    }
+  }, []);
+
+  const onDelete = useCallback(async () => {
+    try {
+      await deleteRoom(state.room.id);
+      navigate("/dashboard");
+      toast({
+        title: "Room deleted",
+        variant: "success"
+      });
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: "Error happened",
+        variant: "destructive"
+      })
+    }
   }, []);
 
   return (
@@ -89,7 +137,7 @@ const Settings = (props) => {
           <span>Danger zone</span>
         </AlertTitle>
         <AlertDescription className="mt-5">
-          <Button variant="destructive">Delete room</Button>
+          <Button variant="destructive" onClick={onDelete}>Delete room</Button>
         </AlertDescription>
       </Alert>
     </div>

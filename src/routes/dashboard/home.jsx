@@ -41,7 +41,6 @@ const CreateDialog = () => {
   });
 
   const onSubmit = async (data) => {
-    console.log(close);
     await createRoom({...data, userId: auth.user.uid})
     close.current.click();
     form.reset();
