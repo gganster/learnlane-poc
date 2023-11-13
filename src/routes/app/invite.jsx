@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-
+import { useToast } from "@/components/ui/use-toast";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -11,6 +11,8 @@ import * as z from "zod";
 import { useCallback } from "react";
 
 import { useParams } from "react-router-dom";
+import { createAnonymousUser } from "@/services/user";
+import { useEffect } from "react";
 
 const formScheme = z.object({
   userName: z.string().min(3, { message: "Username must be at least 3 characters long"}),
@@ -18,8 +20,8 @@ const formScheme = z.object({
 });
 
 const Invite = () => {
+  const {toast} = useToast();
   const { id } = useParams();
-  const { user } = useAuth();
 
   const form = useForm({
     resolver: zodResolver(formScheme),
@@ -30,8 +32,18 @@ const Invite = () => {
   });
 
   const onSubmit = useCallback(async (data) => {
-
-  }, []);
+    try {
+      await createAnonymousUser({
+        data: {
+          ...data,
+          roomId: id,
+        }
+      });
+    } catch (e) {
+      console.error(e);
+      toast({title: "Error happened", type: "destructive"})
+    }
+  }, [id]);
 
   return (
     <div className="h-screen w-screen flex items-center justify-center">
@@ -63,6 +75,9 @@ const Invite = () => {
                 </FormItem>
               )} />
             </CardContent>
+            <CardFooter>
+              <Button type="submit">submit</Button>
+            </CardFooter>
           </Card>
         </form>
       </Form>

@@ -38,7 +38,7 @@ const router = createBrowserRouter([
     path: "/app",
     element: <AppLayout />,
     children: [
-      { path: "/app", element: <AppHome /> },
+      { path: "/app", element: <LogguedRoute><AppHome /></LogguedRoute> },
       { path: "/app/invite/:id", element: <AppInvite />}
     ]
   }
