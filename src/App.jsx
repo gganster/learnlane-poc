@@ -13,10 +13,14 @@ import { ThemeProvider } from "./components/theme-provider.jsx";
 import { AuthProvider } from "./components/auth-provider.jsx";
 
 import DashboardLayout from "./routes/dashboard/layout";
+import AppLayout from "./routes/app/layout";
 
 import Login from "./routes/login.jsx";
 import DashboardHome from "./routes/dashboard/home.jsx";
-import Room from "./routes/dashboard/room/room[id]";
+import DashboardRoom from "./routes/dashboard/room/room[id]";
+
+import AppHome from "./routes/app/home.jsx";
+import AppInvite from "./routes/app/invite";
 
 const router = createBrowserRouter([
   { path: "/", element: <AutologinRoute><Login /></AutologinRoute> },
@@ -27,9 +31,17 @@ const router = createBrowserRouter([
     children: [
       { path: "/dashboard", element: <DashboardHome /> },
       { path: "/dashboard/profile", element: <div>Profile</div> },
-      { path: "/dashboard/rooms/:id", element: <Room />}
+      { path: "/dashboard/rooms/:id", element: <DashboardRoom />}
     ]
   },
+  {
+    path: "/app",
+    element: <AppLayout />,
+    children: [
+      { path: "/app", element: <AppHome /> },
+      { path: "/app/invite/:id", element: <AppInvite />}
+    ]
+  }
 ]);
 
 
