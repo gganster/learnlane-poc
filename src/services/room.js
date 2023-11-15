@@ -17,6 +17,11 @@ export const getRoomsByUserIdRealtime = (userId, callback) => {
   })
 }
 
+export const getRoomsBatch = async (roomsArray) => {
+  const rooms = await Promise.all(roomsArray.map((id) => getRoomById(id)));
+  return rooms;
+}
+
 export const getRoomById = async (id) => {
   const roomDoc = await getDoc(doc("rooms", id));
   if (!roomDoc.exists()) return null;

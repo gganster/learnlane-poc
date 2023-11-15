@@ -15,6 +15,9 @@ import { useRoom } from "@/components/room-provider";
 import {Input} from "@/components/ui/input";
 import { Copy } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useEffect, useState } from "react";
+import { getUsersByRoomIdRealTime } from "@/services/user";
+import { getTasksByRoomIdRealtime } from "@/services/tasks";
 
 const mock = [{id: 1, name: "User 1"}, {id: 2, name: "User 2"}]
 
@@ -22,9 +25,13 @@ const Participants = (props) => {
   const {toast} = useToast();
   const {state} = useRoom();
   const {room} = state;
+  const [tasks, setTasks] = useState([]);
+  const [participants, setParticipants] = useState([]);
+
+  useEffect(() => getTasksByRoomIdRealtime(room.id, setTasks), [room.id]);
+  useEffect(() => getUsersByRoomIdRealTime(room.id, setParticipants), [room.id]);
 
   const link = useMemo(() => {
-    console.log(room);
     return `${window.location.origin}/app/invite/${room?.id}`
   }, [room]);
 
@@ -45,11 +52,11 @@ const Participants = (props) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {mock.map((user) => (
+            {participants.map((user) => (
               <TableRow key={user.id}>
                 <TableCell className="font-medium">{user.id}</TableCell>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>0/13</TableCell>
+                <TableCell>{user.userName} {user.userSurname}</TableCell>
+                <TableCell>{tasks.filter(i => i.participants.includes(user.id)).length}/{tasks?.length ?? 0}</TableCell>
               </TableRow>
             ))}
           </TableBody>

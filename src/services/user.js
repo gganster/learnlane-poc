@@ -1,4 +1,4 @@
-import {doc, getDoc, addDoc, setDoc} from "./firebase";
+import {doc, getDoc, addDoc, setDoc, onSnapshot, query, collection, where} from "./firebase";
 import {auth} from "@/firebase";
 import { signInAnonymously } from "firebase/auth";
 
@@ -21,4 +21,10 @@ export const createAnonymousUser = async ({data}) => {
     });
     console.log("here");
     return user;
+}
+export const getUsersByRoomIdRealTime = (roomId, cb) => {
+    return onSnapshot(query(collection("users"), where("rooms", "array-contains", roomId)), (snapshot) => {
+        const users = snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
+        cb(users);
+    })
 }

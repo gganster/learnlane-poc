@@ -13,6 +13,7 @@ import { useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { createAnonymousUser } from "@/services/user";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const formScheme = z.object({
   userName: z.string().min(3, { message: "Username must be at least 3 characters long"}),
@@ -20,6 +21,7 @@ const formScheme = z.object({
 });
 
 const Invite = () => {
+  const navigate = useNavigate();
   const {toast} = useToast();
   const { id } = useParams();
 
@@ -39,6 +41,7 @@ const Invite = () => {
           roomId: id,
         }
       });
+      navigate(`/app`);
     } catch (e) {
       console.error(e);
       toast({title: "Error happened", type: "destructive"})

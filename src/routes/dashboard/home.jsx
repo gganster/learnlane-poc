@@ -14,16 +14,6 @@ import * as z from "zod";
 import {useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const roomFakeData = [
-  {
-    id: 1,
-    name: "Room 1",
-    description: "Room 1 description",
-    members: [{id: 1, name: "User 1"}, {id: 2, name: "User 2"}],
-    tasks: [{id: 1, name: "Task 1", description: "Task 1 description"}, {id: 2, name: "Task 2", description: "Task 2 description"}, {id: 3, name: "Task 3", description: "Task 3 description"}]
-  },
-];
-
 const createFormScheme = z.object({
   title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
   description: z.string().min(3, {message: "Description must be at least 3 characters long"}),

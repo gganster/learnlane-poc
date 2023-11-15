@@ -21,6 +21,7 @@ import DashboardRoom from "./routes/dashboard/room/room[id]";
 
 import AppHome from "./routes/app/home.jsx";
 import AppInvite from "./routes/app/invite";
+import AppRoom from "./routes/app/room[id]";
 
 const router = createBrowserRouter([
   { path: "/", element: <AutologinRoute><Login /></AutologinRoute> },
@@ -39,7 +40,8 @@ const router = createBrowserRouter([
     element: <AppLayout />,
     children: [
       { path: "/app", element: <LogguedRoute><AppHome /></LogguedRoute> },
-      { path: "/app/invite/:id", element: <AppInvite />}
+      { path: "/app/invite/:id", element: <AppInvite />},
+      { path: "/app/rooms/:id", element: <AppRoom />}
     ]
   }
 ]);
