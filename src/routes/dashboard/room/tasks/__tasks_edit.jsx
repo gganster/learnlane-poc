@@ -33,11 +33,11 @@ const TaskEdit = () => {
     }
   });
   
-  const onSubmit = useCallback(async (data) => {
+  const onSubmit = async (data) => {
     await createTask({...data, roomId: state.room.id})
     close.current.click();
     form.reset();
-  }, []);
+  };
 
   return (
     <>
@@ -50,7 +50,7 @@ const TaskEdit = () => {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} >
               <DialogHeader>
-                <DialogTitle>Create room</DialogTitle>
+                <DialogTitle>Create task</DialogTitle>
                 <DialogDescription>
                   <FormField control={form.control} name="title" render={({field}) => (
                     <FormItem>
