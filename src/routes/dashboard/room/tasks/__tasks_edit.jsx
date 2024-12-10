@@ -5,6 +5,7 @@ import { Dialog, DialogClose, DialogDescription, DialogHeader, DialogTrigger, Di
 import { ListTodo, UserIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 
 import * as z from "zod";
@@ -66,7 +67,7 @@ const TaskEdit = () => {
                     <FormItem>
                       <FormLabel htmlFor="description">Description</FormLabel>
                       <FormControl>
-                        <Input type="text" id="description" placeholder="..." {...field} />
+                        <Textarea {...field} className="min-h-[150px]" />
                       </FormControl>
                       <FormDescription />
                       <FormMessage />
