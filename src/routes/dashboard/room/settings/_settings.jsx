@@ -21,6 +21,7 @@ const createFormScheme = z.object({
   title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
   description: z.string().min(3, {message: "Description must be at least 3 characters long"}),
   locked: z.boolean(),
+  stepbystep: z.boolean(),
 });
 
 const Settings = (props) => {
@@ -34,6 +35,7 @@ const Settings = (props) => {
       title: "",
       description: "",
       locked: false,
+      stepbystep: false,
     }
   });
 
@@ -44,6 +46,7 @@ const Settings = (props) => {
       title: state.room.title,
       description: state.room.description,
       locked: state.room.locked,
+      stepbystep: state.room.stepbystep,
     });
   }, []);
 
@@ -81,63 +84,74 @@ const Settings = (props) => {
   }, []);
 
   return (
-    <div className="flex flex-col" style={{gap: 10}}>
+    <div className="flex flex-col mt-5 gap-4">
       <Card>
-        <Card>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <CardHeader>
-                <CardTitle>Room settings</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <FormField control={form.control} name="title" render={({field}) => (
-                  <FormItem>
-                    <FormLabel htmlFor="title">Title</FormLabel>
-                    <FormControl>
-                      <Input type="text" id="title" placeholder="..." {...field} />
-                    </FormControl>
-                    <FormDescription />
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="description" render={({field}) => (
-                  <FormItem>
-                    <FormLabel htmlFor="description">Description</FormLabel>
-                    <FormControl>
-                      <Input type="text" id="description" placeholder="..." {...field} />
-                    </FormControl>
-                    <FormDescription />
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="locked" render={({field}) => (
-                  <FormItem>
-                    <FormLabel htmlFor="description">Verrouillage</FormLabel>
-                    <FormControl>
-                      <span className="relative left-2 top-1">
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </span>
-                    </FormControl>
-                    <FormDescription>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <CardHeader>
+              <CardTitle>Room settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormField control={form.control} name="title" render={({field}) => (
+                <FormItem>
+                  <FormLabel htmlFor="title">Title</FormLabel>
+                  <FormControl>
+                    <Input type="text" id="title" placeholder="..." {...field} />
+                  </FormControl>
+                  <FormDescription />
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="description" render={({field}) => (
+                <FormItem>
+                  <FormLabel htmlFor="description">Description</FormLabel>
+                  <FormControl>
+                    <Input type="text" id="description" placeholder="..." {...field} />
+                  </FormControl>
+                  <FormDescription />
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="locked" render={({field}) => (
+                <FormItem className="border flex items-center gap-3 mt-4 p-3 rounded-lg border-slate-900">
+                  <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                  <div className="important:mt-0" style={{marginTop: -3}}>
+                    <FormLabel className="font-bold" htmlFor="description">Verrouillage</FormLabel>
+                    <FormDescription className="text-xs">
                       Lock the room, no longer allow new members to join
                     </FormDescription>
-                  </FormItem>
-                )} />
-              </CardContent>
-              <CardFooter>
-                <Button >Save</Button>
-              </CardFooter>
-            </form>
-          </Form>
-        </Card>
+                  </div>
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="stepbystep" render={({field}) => (
+                <FormItem className="border flex items-center gap-3 mt-4 p-3 rounded-lg border-slate-900">
+                  <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                  <div className="important:mt-0" style={{marginTop: -3}}>
+                    <FormLabel className="font-bold" htmlFor="description">Strict Step by Step</FormLabel>
+                    <FormDescription className="text-xs">
+                    Forces members to validate previous tasks before being able to do and see the next ones.
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )} />
+            </CardContent>
+            <CardFooter>
+              <Button >Save</Button>
+            </CardFooter>
+          </form>
+        </Form>
       </Card>
-      <Alert>
+      <Alert className="border border-slate-950">
         <AlertTitle className="flex items-center" style={{gap: 10}}>
           <AlertTriangle />
           <span>Danger zone</span>
         </AlertTitle>
         <AlertDescription className="mt-5">
-          <Button variant="destructive" onClick={onDelete}>Delete room</Button>
+          <Button variant="destructive" className='h-8 rounded-md' onClick={onDelete}>Delete room</Button>
         </AlertDescription>
       </Alert>
     </div>

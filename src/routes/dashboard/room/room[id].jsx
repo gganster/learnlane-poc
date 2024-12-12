@@ -13,9 +13,9 @@ const Room = () => {
     <RoomProvider roomId={id}>
       <Tabs defaultValue="tasks" className="w-full">
         <TabsList>
-          <TabsTrigger value="tasks">tasks</TabsTrigger>
-          <TabsTrigger value="participants">participants</TabsTrigger>
-          <TabsTrigger value="settings">settings</TabsTrigger>
+          <TabsTrigger value="tasks">Tasks</TabsTrigger>
+          <TabsTrigger value="participants">Participants</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
         <TabsContent value="tasks"><Tasks /></TabsContent>
         <TabsContent value="participants"><Participants /></TabsContent>

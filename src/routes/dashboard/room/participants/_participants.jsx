@@ -46,26 +46,26 @@ const Participants = (props) => {
         <Table className="flex-1 w-full">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">id</TableHead>
-              <TableHead>name</TableHead>
-              <TableHead>Task success</TableHead>
+              <TableHead className="w-[100px]">🆔</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Task Rate</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {participants.map((user) => (
               <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.id}</TableCell>
+                <TableCell><code className="dark:bg-slate-800 bg-gray-200 p-2 py-1 rounded-sm text-[12px]">{user.id}</code></TableCell>
                 <TableCell>{user.userName} {user.userSurname}</TableCell>
-                <TableCell>{tasks.filter(i => i.participants.includes(user.id)).length}/{tasks?.length ?? 0}</TableCell>
+                <TableCell className="text-green-500">{tasks.filter(i => i.participants.includes(user.id)).length}/{tasks?.length ?? 0}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
       <Separator className="my-6" />
-      <div className="justify-center w-full flex items-stretch">
-        <Input value={link} readOnly className="flex-1" />
-        <Button onClick={copyInviteLink}><Copy /></Button>
+      <div className="justify-center w-full flex items-stretch gap-3">
+        <Input value={link} readOnly className="flex-1 text-xs text-gray-300" />
+        <Button onClick={copyInviteLink}><Copy width={14} /></Button>
       </div>
     </div>
   )
