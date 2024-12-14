@@ -135,7 +135,7 @@ const TaskEdit = ({ task, onClose }) => {
                         {editedTask.attachments.map((url, index) => (
                           <li key={index} className="flex items-center justify-between">
                             <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-                              Attachment {index + 1}
+                              {url.replaceAll("%2F", "/").split("?")[0].split("/")[9]}
                             </a>
                             <Button type="button" variant="ghost" onClick={() => handleDeleteAttachment(url)}>
                               Delete
