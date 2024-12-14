@@ -44,20 +44,48 @@ const TaskDialog = ({ task, onClose, onToggleComplete }) => {
            />
           {task?.attachments && task.attachments.length > 0 && (
             <div>
-              <h3 className="mt-4 font-bold">Attachments:</h3>
+              <h3 className="mt-4 mb-1 underline font-bold">Attachments:</h3>
               <ul>
-                {task.attachments.map((url, index) => (
-                  <li key={index}>
-                    <a
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 underline"
-                    >
-                      Download Attachment {index + 1}
-                    </a>
-                  </li>
-                ))}
+                {task.attachments.map((url, index) => {
+                  const isImage = url.match(/\.(jpeg|jpg|gif|png|webp)/i);
+                  const isVideo = url.match(/\.(mp4|webm|ogg|mov)/i);
+
+                  const file_name = url.replaceAll("%2F", "/").split("?")[0].split("/")[9]
+
+                  return (
+                    <li key={index} className="mb-2 w-full">
+                      {isImage && (
+                        <a href={url} className="text-slate-600 w-full p-3 py-2 border border-slate-900 rounded-md flex flex-col gap-3">
+                          <div className="flex gap-2">
+                            <span className="text-white font-bold text-sm">Download</span><span>{file_name}</span>
+                          </div>
+                          <img
+                            src={url}
+                            alt={`${file_name}`}
+                            className="w-32 h-auto object-cover rounded-md"
+                          />
+                        </a>
+                      )}
+                      {isVideo && (
+                        <video
+                          src={url}
+                          controls
+                          className="w-64 h-32 rounded-md"
+                        />
+                      )}
+                      {!isImage && !isVideo && (
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-slate-600 w-full p-3 py-2 border border-slate-900 rounded-md flex gap-2"
+                        >
+                          <span className="text-white font-bold text-sm">Download</span><span>{file_name}</span>
+                        </a>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
@@ -142,7 +170,7 @@ const Room = () => {
         <TableBody>
           {tasks.map((task, index) => (
             <TableRow key={task.id} onClick={() => { if (!isTaskLocked(index)) {handleTaskClick(task)}}} className="cursor-pointer">
-              <TableCell className="font-medium">
+              <TableCell className="font-medium flex items-center gap-2">
                 {task.attachments && task.attachments.length > 0 ? <LucidePaperclip className="bg-green-300/40 text-green-700 dark:text-green-200 border border-green-400/60 w-6 h-6 p-[5px] rounded-md"/> : ''}
                 {!isTaskLocked(index) ? task.title : <LockedBadge/>}
               </TableCell>
