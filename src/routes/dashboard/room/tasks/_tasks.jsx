@@ -59,7 +59,7 @@ const Tasks = (props) => {
         <TableBody>
           {tasks.map((task) => (
             <TableRow key={task.id} className="cursor-pointer" onClick={() => handleTaskClick(task)}>
-              <TableCell className="font-medium">
+              <TableCell className="font-medium flex items-center gap-2">
                 {task.attachments && task.attachments.length > 0 ? <LucidePaperclip className="bg-green-300/40 text-green-700 dark:text-green-200 border border-green-400/60 w-6 h-6 p-[5px] rounded-md"/> : ''}
                 {task.title}
               </TableCell>
