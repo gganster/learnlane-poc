@@ -3,10 +3,15 @@ import { useAuth } from "@/components/auth-provider";
 import {Outlet, Link} from "react-router-dom";
 import { useTheme } from "@/components/theme-provider";
 import { Sun, Moon, Power } from "lucide-react";
-
+import { useNavigate } from "react-router-dom";
 const DashboardLayout = () => {
-  const { logout } = useAuth();
+  const { logout, auth } = useAuth();
   const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
+
+  if(auth.user.isAnonymous) {
+    navigate("/app");
+  }
 
   return (
     <>
