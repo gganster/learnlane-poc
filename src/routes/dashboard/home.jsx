@@ -86,7 +86,7 @@ const DashboardHome = () => {
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
-    return getRoomsByUserIdRealtime(auth.user.uid, setRooms);
+    return getRoomsByUserIdRealtime(auth.user.uid ?? auth.user.user.uid, setRooms);
   }, [auth]);
 
   return (
