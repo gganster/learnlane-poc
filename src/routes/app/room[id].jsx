@@ -16,7 +16,7 @@ import { LucideArrowBigLeft, LucideArrowLeft, LucideArrowLeftSquare, LucideArrow
 import { useCallback } from "react";
 import { deleteTask } from "@/services/tasks";
 import { getUsersByRoomIdRealTime } from "@/services/user";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/auth-provider";
 import { Square } from "lucide-react";
 import { CheckSquare } from "lucide-react";
@@ -113,6 +113,11 @@ const Room = () => {
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
   const [stepByStep, setStepByStep] = useState(false);
+  const navigate = useNavigate();
+
+  if (!auth.user) {
+    navigate("/");
+  }
   
   const handleTaskClick = (task) => {
     setSelectedTask(task);

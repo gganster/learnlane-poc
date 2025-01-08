@@ -9,7 +9,7 @@ const DashboardLayout = () => {
   const { theme, setTheme } = useTheme();
 
   const alertBeforeLogout = () => {
-    if (window.confirm("Tu ne pourra plus te reconnecter a tes rooms, tu est sur ?")) {
+    if (window.confirm("Tu ne pourras plus te reconnecter à tes rooms, es-tu sur ?")) {
       logout();
     }
   }

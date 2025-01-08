@@ -40,8 +40,9 @@ const Invite = () => {
           ...data,
           roomId: id,
         }
+      }).then(() => {
+        navigate(`/app`);
       });
-      navigate(`/app`);
     } catch (e) {
       console.error(e);
       toast({title: "Error happened", type: "destructive"})
@@ -49,10 +50,10 @@ const Invite = () => {
   }, [id]);
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center">
+    <div className="h-[70vh] w-screen flex items-center justify-center">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-[400px] ">
+          <Card className="w-full">
             <CardHeader>
               <CardTitle>Invite</CardTitle>
             </CardHeader>

@@ -39,10 +39,10 @@ const Login = () => {
   }, []);
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center" >
+    <div className="h-[80vh] w-screen flex items-center justify-center" >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-[400px] ">
+          <Card className="w-full">
             <CardHeader>
               <CardTitle>Login</CardTitle>
             </CardHeader>
