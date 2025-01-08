@@ -2,6 +2,7 @@ import {db} from "@/firebase";
 import {
   doc          as fdoc,
   collection   as fcollection,
+  getDocs       as fgetDocs,
   getDoc       as fgetDoc,
   setDoc       as fsetDoc,
   addDoc       as faddDoc,
@@ -16,6 +17,7 @@ import {
 export const doc = (...args) => fdoc(db, ...args);
 export const setDoc = (...args) => fsetDoc(...args);
 export const getDoc = (...args) => fgetDoc(...args);
+export const getDocs = (...args) => fgetDocs(...args);
 export const addDoc = (...args) => faddDoc(...args);
 export const deleteDoc = (...args) => fdeleteDoc(...args);
 

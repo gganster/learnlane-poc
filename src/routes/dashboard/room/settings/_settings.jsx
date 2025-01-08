@@ -1,11 +1,12 @@
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState, useRef } from "react";
 
 import {Button} from "@/components/ui/button";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { FormField, Form, FormControl, FormDescription, FormMessage, FormItem, FormLabel } from "@/components/ui/form";
+import { Dialog, DialogClose, DialogDescription, DialogHeader, DialogTrigger, DialogContent, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
@@ -14,20 +15,131 @@ import { useRoom } from "@/components/room-provider";
 import * as z from "zod";
 import {useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { deleteRoom, updateRoom } from "@/services/room";
+import { deleteRoom, updateRoom, cloneRoom } from "@/services/room";
 import { useNavigate } from "react-router-dom";
 
 const createFormScheme = z.object({
   title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
+  newtitle: z.string().min(3, {message: "Title must be at least 3 characters long"}),
   description: z.string().min(3, {message: "Description must be at least 3 characters long"}),
   locked: z.boolean(),
   stepbystep: z.boolean(),
+  cloneParticipants: z.boolean(),
+  cloneTasks: z.boolean(),
 });
+
+const CloneRoom = ({ isOpen, onClose }) => {
+  const { state } = useRoom();
+  const close = useRef(null);
+  const navigate = useNavigate();
+  const {toast} = useToast();
+  const [loading, setLoading] = useState(false);
+
+  const form = useForm({
+    resolver: zodResolver(createFormScheme),
+    defaultValues: {
+      newtitle: "",
+      cloneParticipants: false,
+      cloneTasks: false,
+    }
+  });
+
+  useEffect(() => {
+    if (!state.room) return;
+
+    form.reset({
+      newtitle: state.room.title,
+      cloneParticipants: false,
+      cloneTasks: false,
+    });
+  }, []);
+
+  const onSubmit = async (data) => {
+    setLoading(true);
+    try {
+      const newRoom = await cloneRoom(state.room.id, data.newtitle, data.cloneParticipants, data.cloneTasks);
+      navigate(`/dashboard/rooms/${newRoom.id}`);
+      toast({
+        title: "Room cloned",
+        variant: "success"
+      });
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: "Error happened",
+        variant: "destructive"
+      })
+    } finally {
+      setLoading(false);
+    }
+    
+    onClose();
+  };
+
+  return (
+    <Dialog open={!!isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <Form {...form}>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit(form.getValues());
+          }} >
+            <DialogHeader>
+              <DialogTitle>Duplicate the room</DialogTitle>
+              <DialogDescription className="mt-5">
+                <FormField control={form.control} name="newtitle" render={({field}) => (
+                  <FormItem>
+                    <FormLabel htmlFor="newtitle">Title</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="text" id="newtitle" placeholder="Choisissez un nouveau nom pour la room dupliqué..." />
+                    </FormControl>
+                    <FormDescription />
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="cloneParticipants" render={({field}) => (
+                  <FormItem className="flex items-center gap-3 mt-4 mb-8 rounded-lg">
+                    <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <div className="important:mt-0" style={{marginTop: -3}}>
+                      <FormLabel className="font-bold" htmlFor="description">Clone with participants</FormLabel>
+                      <FormDescription className="text-xs">Duplicate the room, giving current participants access to the duplicated room</FormDescription>
+                    </div>
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="cloneTasks" render={({field}) => (
+                  <FormItem className="flex items-center gap-3 mt-4 mb-8 rounded-lg">
+                    <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <div className="important:mt-0" style={{marginTop: -3}}>
+                      <FormLabel className="font-bold" htmlFor="description">Clone with tasks</FormLabel>
+                      <FormDescription className="text-xs">Duplicate the room with the actual tasks</FormDescription>
+                    </div>
+                  </FormItem>
+                )} />
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="mt-4">
+              <Button variant="outline" type="" onClick={onClose}>Cancel</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Duplication..." : "Dupliquer"}
+              </Button>
+            </DialogFooter>
+            </form>
+          </Form>
+      </DialogContent>
+      <DialogClose ref={close} />
+    </Dialog>
+  );
+};
 
 const Settings = (props) => {
   const {state} = useRoom();
   const {toast} = useToast();
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(createFormScheme),
@@ -83,11 +195,22 @@ const Settings = (props) => {
     }
   }, []);
 
+  const handleOpenDialog = () => {
+    setIsOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsOpen(false);
+  };
+
   return (
     <div className="flex flex-col mt-5 gap-4">
       <Card>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit(form.getValues());
+          }} >
             <CardHeader>
               <CardTitle>Room settings</CardTitle>
             </CardHeader>
@@ -139,8 +262,9 @@ const Settings = (props) => {
                 </FormItem>
               )} />
             </CardContent>
-            <CardFooter>
-              <Button >Save</Button>
+            <CardFooter className="flex gap-3">
+              <Button type="submit">Save</Button>
+              <Button variant="secondary" type="button" onClick={() => handleOpenDialog()}>Duplicate room</Button>
             </CardFooter>
           </form>
         </Form>
@@ -154,6 +278,8 @@ const Settings = (props) => {
           <Button variant="destructive" className='h-8 rounded-md' onClick={onDelete}>Delete room</Button>
         </AlertDescription>
       </Alert>
+
+      <CloneRoom isOpen={isOpen} onClose={handleCloseDialog} />
     </div>
   )
 }
