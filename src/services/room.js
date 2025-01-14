@@ -1,6 +1,13 @@
 import {doc, getDoc, getDocs, addDoc, collection, onSnapshot, query, where, setDoc, deleteDoc} from "./firebase";
 
 export const createRoom = async ({title, description, userId=null, locked=false, stepbystep=false}) => {
+  const q = query(collection("rooms"), where("title", "==", title), where("userId", "==", userId));
+  const existingRooms = await getDocs(q);
+
+  if (!existingRooms.empty) {
+    return null;
+  }
+
   return await addDoc(collection("rooms"), {
     title,
     description,

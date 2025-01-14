@@ -6,6 +6,7 @@ import { ListTodo, UserIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 
 import { useAuth } from "@/components/auth-provider";
 import { createRoom, getRoomsByUserIdRealtime } from "@/services/room";
@@ -13,6 +14,7 @@ import { createRoom, getRoomsByUserIdRealtime } from "@/services/room";
 import * as z from "zod";
 import {useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "@/components/ui/use-toast";
 
 const createFormScheme = z.object({
   title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
@@ -22,6 +24,7 @@ const createFormScheme = z.object({
 const CreateDialog = () => {
   const close = useRef(null);
   const {auth} = useAuth();
+  const {toast} = useToast();
 
   const form = useForm({
     resolver: zodResolver(createFormScheme),
@@ -31,7 +34,14 @@ const CreateDialog = () => {
   });
 
   const onSubmit = async (data) => {
-    await createRoom({...data, userId: auth.user.uid})
+    const Room = await createRoom({...data, userId: auth.user.uid});
+    if (Room == null) {
+      toast({
+        title: "Erreur",
+        description: "Une room existe déjà avec ce nom.",
+        type: "error",
+      })
+    }
     close.current.click();
     form.reset();
   }

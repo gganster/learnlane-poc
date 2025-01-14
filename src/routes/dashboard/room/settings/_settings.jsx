@@ -58,7 +58,8 @@ const CloneRoom = ({ isOpen, onClose }) => {
     setLoading(true);
     if(data.newtitle === state.room.title) {
       return toast({
-        title: "Les titres doivent être différents",
+        title: "Erreur",
+        description: "Le nom doit être différent de celui de la room actuelle.",
         variant: "destructive"
       })
     }
