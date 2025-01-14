@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .landing-page {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    
+    --foreground: 0, 0%, 20%;
+    --foreground_hovered: 0, 0%, 15%;
+    --background: 0, 0%, 100%;
+    --accent-color: 0, 100%, 72%;
+    --lightborder: 0, 0%, 57%, 0.38;
+
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: "Montserrat", sans-serif;
+
+    background-image: url('src/assets/grid.svg');
+    background-size: 100% auto;
+  }
+}

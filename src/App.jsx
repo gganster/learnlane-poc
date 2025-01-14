@@ -16,6 +16,7 @@ import DashboardLayout from "./routes/dashboard/layout";
 import AppLayout from "./routes/app/layout";
 
 import Login from "./routes/login.jsx";
+import LandingPage from "./routes/landing-page.jsx";
 import DashboardHome from "./routes/dashboard/home.jsx";
 import DashboardRoom from "./routes/dashboard/room/room[id]";
 
@@ -24,7 +25,7 @@ import AppInvite from "./routes/app/invite";
 import AppRoom from "./routes/app/room[id]";
 
 const router = createBrowserRouter([
-  { path: "/", element: <AutologinRoute><Login /></AutologinRoute> },
+  { path: "/", element: <LandingPage /> },
   { path: "/login", element: <AutologinRoute><Login /></AutologinRoute> },
   { 
     path: "/dashboard", 

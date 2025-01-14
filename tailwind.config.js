@@ -24,6 +24,9 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        foreground_hovered: 'hsl(var(--foreground_hovered))',
+        accent: 'hsl(var(--accent-color))',
+        lightborder: 'hsla(var(--lightborder))',
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
