@@ -2,25 +2,27 @@ import { doc, getDoc, addDoc, collection, onSnapshot, query, setDoc, deleteDoc, 
 import { ref, deleteObject } from "firebase/storage";
 import { storage } from "@/firebase";
 
-export const createTask = async ({title, description, roomId, attachments}) => {
+export const createTask = async ({title, description, roomId, attachments, position}) => {
   await addDoc(collection("rooms", roomId, "tasks"), {
     title,
     description,
     participants: [],
     attachments: attachments,
+    position: position || 0,
     createdAt: new Date(),
     updatedAt: new Date(),
   });
 }
 
 export const getTasksByRoomIdRealtime = (roomId, callback) => {
-  return onSnapshot(query(collection("rooms", roomId, "tasks"), orderBy("createdAt", "asc")), (snapshot) => {
+  return onSnapshot(query(collection("rooms", roomId, "tasks"), orderBy("position", "asc")), (snapshot) => {
     const tasks = snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
     callback(tasks);
   })
 }
 
 export const updateTask = async ({roomId, id, data}) => {
+  console.log("attachments", data.attachments);
   await setDoc(doc("rooms", roomId, "tasks", id), {
     ...data,
     updatedAt: new Date(),
@@ -53,4 +55,12 @@ export const deleteTask = async (roomId, id) => {
   } catch (error) {
     console.error(`Failed to delete task with ID ${id}:`, error);
   }
+};
+
+export const updateTaskPositions = async (roomId, tasks) => {
+  const batch = tasks.map((task, index) =>
+    setDoc(doc("rooms", roomId, "tasks", task.id), { position: index }, { merge: true })
+  );
+
+  await Promise.all(batch);
 };
