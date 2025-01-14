@@ -56,6 +56,12 @@ const CloneRoom = ({ isOpen, onClose }) => {
 
   const onSubmit = async (data) => {
     setLoading(true);
+    if(data.newtitle === state.room.title) {
+      return toast({
+        title: "Les titres doivent être différents",
+        variant: "destructive"
+      })
+    }
     try {
       const newRoom = await cloneRoom(state.room.id, data.newtitle, data.cloneParticipants, data.cloneTasks);
       navigate(`/dashboard/rooms/${newRoom.id}`);
