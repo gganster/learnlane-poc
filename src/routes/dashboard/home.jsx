@@ -10,11 +10,12 @@ import { useToast } from "@/components/ui/use-toast";
 
 import { useAuth } from "@/components/auth-provider";
 import { createRoom, getRoomsByUserIdRealtime } from "@/services/room";
+import { getTasksByRoomIdRealtime } from "@/services/tasks";
+import { getUsersByRoomIdRealTime } from "@/services/user";
 
 import * as z from "zod";
 import {useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "@/components/ui/use-toast";
 
 const createFormScheme = z.object({
   title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
@@ -96,7 +97,29 @@ const DashboardHome = () => {
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
-    return getRoomsByUserIdRealtime(auth.user.uid ?? auth.user.user.uid, setRooms);
+    const userId = auth.user?.uid ?? auth.user.user?.uid;
+
+    if (userId) {
+      getRoomsByUserIdRealtime(userId, (fetchedRooms) => {
+        const updatedRooms = fetchedRooms.map((room) => ({
+          ...room,
+          membersCount: 0,
+          tasksCount: 0,  
+        }));
+
+        updatedRooms.forEach((room, index) => {
+          getUsersByRoomIdRealTime(room.id, (users) => {
+            updatedRooms[index].membersCount = users.length;
+            setRooms([...updatedRooms]);
+          });
+
+          getTasksByRoomIdRealtime(room.id, (tasks) => {
+            updatedRooms[index].tasksCount = tasks.length;
+            setRooms([...updatedRooms]);
+          });
+        });
+      });
+    }
   }, [auth]);
 
   return (
@@ -115,30 +138,34 @@ const DashboardHome = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {rooms.map((room) => (
-              <Link key={room.id} to={`/dashboard/rooms/${room.id}`}>
-              <Card  className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-900">
-                <CardHeader className="relative">
-                  <CardTitle>{room.title}</CardTitle>
-                  <CardDescription>{room.description}</CardDescription>
-                </CardHeader>
-                <CardContent >
-                  <div className="flex items-center justify-center" style={{gap: 10}}>
-                    <div className="flex items-center" style={{gap: 4}}>
-                      <UserIcon />
-                      {room.members?.length ?? 0}
-                    </div>
-                    <div className="flex items-center border-l pl-2" style={{gap: 4}}>
-                      <ListTodo />
-                      {room.tasks?.length ?? 0}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              </Link>
+          {rooms.length === 0 ? (
+              <p className="w-full text-center opacity-60">No rooms available</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {rooms.map((room) => (
+                  <Link key={room.id} to={`/dashboard/rooms/${room.id}`}>
+                  <Card className="relative cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-900">
+                    <CardHeader className="relative">
+                      <CardTitle>{room.title}</CardTitle>
+                      <CardDescription>{room.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent >
+                      <div className="flex items-center justify-center absolute right-3 top-3 bg-border/50 p-1 px-3 rounded-lg" style={{gap: 10}}>
+                        <div className="flex items-center" style={{gap: 5}}>
+                          <UserIcon className="w-4"/>
+                          <p className="font-medium text-xs">{room.membersCount ?? 0}</p>
+                        </div>
+                        <div className="flex items-center border-l pl-2" style={{gap: 5}}>
+                          <ListTodo className="w-4"/>
+                          <p className="font-medium text-xs">{room.tasksCount ?? 0}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  </Link>
             ))}
           </div>
+          )}
         </CardContent>
       </Card>
     </div>
