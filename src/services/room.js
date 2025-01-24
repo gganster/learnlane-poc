@@ -50,10 +50,11 @@ export const getRoomByIdRealTime = (id, callback) => {
   })
 }
 
-export const updateRoom = async ({id, data}) => {
+export const updateRoom = async ({id, data, uid}) => {
   await setDoc(doc("rooms", id), {
     ...data,
     updatedAt: new Date(),
+    userId: uid
   });
 }
 

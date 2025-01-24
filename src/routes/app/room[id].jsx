@@ -112,7 +112,8 @@ const Room = () => {
   const {auth} = useAuth();
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [stepByStep, setStepByStep] = useState(false);
+  const [roomSettings, setroomSettings] = useState({});
+  const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
   if (!auth.user) {
@@ -129,19 +130,29 @@ const Room = () => {
 
   useEffect(() => {
     getTasksByRoomIdRealtime(id, setTasks);
-
+  
     const fetchRoomSettings = async () => {
       try {
         const roomData = await getRoomById(id);
         if (roomData) {
-          setStepByStep(roomData.stepbystep);
+          setroomSettings({
+            ...roomData,
+          });
         }
       } catch (error) {
         console.error("Failed to fetch room settings:", error);
       }
     };
-
-    fetchRoomSettings(stepByStep);
+  
+    const unsubscribeUsers = getUsersByRoomIdRealTime(id, (fetchedUsers) => {
+      setUsers(fetchedUsers || []);
+    });
+  
+    fetchRoomSettings();
+  
+    return () => {
+      unsubscribeUsers();
+    };
   }, [id]);
 
   const check = async (taskId) => {
@@ -156,14 +167,44 @@ const Room = () => {
   }
 
   const isTaskLocked = (index) => {
-    if (!stepByStep) return false; // Si stepByStep est désactivé, tout est accessible
-    if (index === 0) return false; // La première tâche est toujours déverrouillée
-    return !tasks[index - 1]?.participants?.includes(auth.user.uid); // Verrouille si la tâche précédente n'est pas complétée
+    if (!roomSettings.stepbystep && !roomSettings.cohesionMode) return false;
+  
+    if (index === 0) return false;
+  
+    const previousTask = tasks[index - 1];
+    if (!previousTask) return true;
+  
+    const totalParticipants = users.length;
+    const validatedParticipants = users.filter((user) =>
+      previousTask.participants?.includes(user.id)
+    ).length;
+  
+    if (roomSettings.stepbystep && !previousTask.participants?.includes(auth.user.uid)) {
+      return true;
+    }
+  
+    if (roomSettings.cohesionMode) {
+      if (roomSettings.requireAllMembers) {
+        return validatedParticipants !== totalParticipants;
+      }
+  
+      return validatedParticipants < roomSettings.numberOfValidations;
+    }
+  
+    return false;
   };
 
   return (
     <>
-      <Link to={"/app"}><Button variant="secondary" size='sm' className="flex gap-1"><LucideArrowBigLeft width={20}/>My Rooms</Button></Link>
+      <div className="flex gap-2">
+        <Link to={"/app"}><Button variant="outline" size='sm' className="flex gap-1"><LucideArrowBigLeft width={20}/>My Rooms</Button></Link>
+        <Link to={"chat"}>
+          <Button variant="outline" size='sm' className="relative flex gap-1">
+            Room chat
+            <span className="absolute -right-2 -top-2 bg-red-500 p-2 py-[1px] text-[11px] rounded-full">2</span>
+          </Button>
+        </Link>
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
@@ -174,7 +215,15 @@ const Room = () => {
         </TableHeader>
         <TableBody>
           {tasks.map((task, index) => (
-            <TableRow key={task.id} onClick={() => { if (!isTaskLocked(index)) {handleTaskClick(task)}}} className="cursor-pointer">
+            <TableRow 
+              key={task.id} 
+              onClick={() => { 
+                if (!isTaskLocked(index)) {
+                  handleTaskClick(task)
+                }}
+              } className={`cursor-pointer ${
+                isTaskLocked(index) ? "opacity-50 pointer-events-none" : ""
+              }`}>
               <TableCell className="font-medium flex items-center gap-2">
                 {task.attachments && task.attachments.length > 0 ? <LucidePaperclip className="bg-green-300/40 text-green-700 dark:text-green-200 border border-green-400/60 w-6 h-6 p-[5px] rounded-md"/> : ''}
                 {!isTaskLocked(index) ? task.title : <LockedBadge/>}

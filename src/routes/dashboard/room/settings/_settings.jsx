@@ -26,6 +26,7 @@ const createFormScheme = z.object({
   stepbystep: z.boolean(),
   cloneParticipants: z.boolean(),
   cloneTasks: z.boolean(),
+  cohesionMode: z.boolean(),
 });
 
 const CloneRoom = ({ isOpen, onClose }) => {
@@ -67,13 +68,13 @@ const CloneRoom = ({ isOpen, onClose }) => {
       const newRoom = await cloneRoom(state.room.id, data.newtitle, data.cloneParticipants, data.cloneTasks);
       navigate(`/dashboard/rooms/${newRoom.id}`);
       toast({
-        title: "Room cloned",
-        variant: "success"
+        title: "✅ Room cloned",
+        variant: "default"
       });
     } catch (e) {
       console.error(e);
       toast({
-        title: "Error happened",
+        title: "❌ Error happened",
         variant: "destructive"
       })
     } finally {
@@ -155,6 +156,9 @@ const Settings = (props) => {
       description: "",
       locked: false,
       stepbystep: false,
+      cohesionMode: false,
+      requireAllMembers: true,
+      numberOfValidations: 0,
     }
   });
 
@@ -166,20 +170,24 @@ const Settings = (props) => {
       description: state.room.description,
       locked: state.room.locked,
       stepbystep: state.room.stepbystep,
+      cohesionMode: state.room.cohesionMode,
+      requireAllMembers: state.room.requireAllMembers ?? form.defaultValues.requireAllMembers,
+      numberOfValidations: state.room.numberOfValidations ?? form.defaultValues.numberOfValidations,
     });
   }, []);
 
   const onSubmit = useCallback(async (data) => {
+    console.log(data)
     try {
-      await updateRoom({id: state.room.id, data});
+      await updateRoom({id: state.room.id, data, uid: state.room.userId});
       toast({
-        title: "Room updated",
-        variant: "success"
+        title: "✅ Room updated",
+        variant: "default"
       });
     } catch (e) {
       console.error(e);
       toast({
-        title: "Error happened",
+        title: "❌ Error happened",
         variant: "destructive"
       })
     }
@@ -190,13 +198,13 @@ const Settings = (props) => {
       await deleteRoom(state.room.id);
       navigate("/dashboard");
       toast({
-        title: "Room deleted",
-        variant: "success"
+        title: "✅ Room deleted",
+        variant: "default"
       });
     } catch (e) {
       console.error(e);
       toast({
-        title: "Error happened",
+        title: "❌ Error happened",
         variant: "destructive"
       })
     }
@@ -250,11 +258,73 @@ const Settings = (props) => {
                   <div className="important:mt-0" style={{marginTop: -3}}>
                     <FormLabel className="font-bold" htmlFor="description">Verrouillage</FormLabel>
                     <FormDescription className="text-xs">
-                      Lock the room, no longer allow new members to join
+                      Lock the room, no longer allow new members to join.
                     </FormDescription>
                   </div>
                 </FormItem>
               )} />
+              <FormField control={form.control} name="cohesionMode" render={({field}) => (
+                <FormItem className="border mt-4 p-3 rounded-lg border-slate-900">
+                  <div className={`flex items-center gap-3 ${field.value ? "mb-5" : ""}`}>
+                    <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <div className="important:mt-0" style={{marginTop: -3}}>
+                      <FormLabel className="font-bold" htmlFor="description">Cohesion Mode</FormLabel>
+                      <FormDescription className="text-xs">
+                        Prevents access to the next task until a specific validation rule is met.
+                      </FormDescription>
+                    </div>
+                  </div>
+
+                  {field.value && (
+                    <div className="border-t py-3">
+                      <strong>Settings</strong>
+                      <div className="flex flex-col gap-2 mt-3">
+                        {/* Toggle to require all members */}
+                        <FormField control={form.control} name="requireAllMembers" render={({field: allMembersField}) => (
+                          <div className="flex items-center gap-3">
+                            <FormControl>
+                                <Switch 
+                                  checked={allMembersField.value} 
+                                  onCheckedChange={(checked) => {
+                                    allMembersField.onChange(checked);
+                                    form.setValue("requireAllMembers", checked); // Met à jour explicitement
+                                  }} 
+                                />
+                            </FormControl>
+                            <div className="important:mt-0" style={{marginTop: -3}}>
+                              <FormDescription className="text-xs">
+                                Require all members to validate the current task before proceeding to the next one.
+                              </FormDescription>
+                            </div>
+                          </div>
+                        )} />
+
+                        {/* Number of validations (visible only if "requireAllMembers" is false) */}
+                        <FormField control={form.control} name="numberOfValidations" render={({field: validationsField}) => (
+                          !form.watch("requireAllMembers") && ( // Utilisation de `form.watch` pour forcer le re-rendu
+                            <div className="mt-3">
+                              <div className="flex justify-between w-full items-center">
+                                <label className="font-bold">Number of validations</label>
+                                <small className="opacity-60">
+                                  Specify how many members must validate the task before unlocking the next one.
+                                </small>
+                              </div>
+                              <Input
+                                type="number"
+                                className="flex-1 text-xs text-gray-200 border border-slate-400"
+                                {...validationsField}
+                              />
+                            </div>
+                          )
+                        )} />
+                      </div>
+                    </div>
+                  )}
+                </FormItem>
+              )} />
+
               <FormField control={form.control} name="stepbystep" render={({field}) => (
                 <FormItem className="border flex items-center gap-3 mt-4 p-3 rounded-lg border-slate-900">
                   <FormControl>

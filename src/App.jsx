@@ -1,58 +1,65 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { createBrowserRouter } from "react-router-dom";
-import {Toaster} from "./components/ui/toaster";
-import { useAuth } from "./components/auth-provider.jsx";
-
-import AutologinRoute from "./components/router/autologin";
-import LogguedRoute from "./components/router/logged";
-
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { useEffect } from "react";
+import { initGA, trackPageView } from "./analytics"; // Import Google Analytics
+import { Toaster } from "./components/ui/toaster";
 import ProviderBundler from "./components/provider-bundler";
 import { AppLoadingProvider } from "./components/app-loading-provider.jsx";
-import { RouterProvider } from "react-router-dom";
 import { ThemeProvider } from "./components/theme-provider.jsx";
 import { AuthProvider } from "./components/auth-provider.jsx";
 
 import DashboardLayout from "./routes/dashboard/layout";
 import AppLayout from "./routes/app/layout";
-
-import Login from "./routes/login.jsx";
 import LandingPage from "./routes/landing-page.jsx";
+import Login from "./routes/login.jsx";
 import DashboardHome from "./routes/dashboard/home.jsx";
 import DashboardRoom from "./routes/dashboard/room/room[id]";
-
 import AppHome from "./routes/app/home.jsx";
 import AppInvite from "./routes/app/invite";
 import AppRoom from "./routes/app/room[id]";
+import AppChat from "./routes/app/roomChat";
 
 const router = createBrowserRouter([
   { path: "/", element: <LandingPage /> },
-  { path: "/login", element: <AutologinRoute><Login /></AutologinRoute> },
-  { 
-    path: "/dashboard", 
-    element: <LogguedRoute><DashboardLayout /></LogguedRoute>,
+  { path: "/login", element: <Login /> },
+  {
+    path: "/dashboard",
+    element: <DashboardLayout />,
     children: [
       { path: "/dashboard", element: <DashboardHome /> },
-      { path: "/dashboard/profile", element: <div>Profile</div> },
-      { path: "/dashboard/rooms/:id", element: <DashboardRoom />}
+      { path: "/dashboard/rooms/:id", element: <DashboardRoom /> }
     ]
   },
   {
     path: "/app",
     element: <AppLayout />,
     children: [
-      { path: "/app", element: <LogguedRoute><AppHome /></LogguedRoute> },
-      { path: "/app/invite/:id", element: <AppInvite />},
-      { path: "/app/rooms/:id", element: <AppRoom />}
+      { path: "/app", element: <AppHome /> },
+      { path: "/app/invite/:id", element: <AppInvite /> },
+      { path: "/app/rooms/:id", element: <AppRoom /> },
+      { path: "/app/rooms/:id/chat", element: <AppChat /> }
     ]
   }
 ]);
 
 const App = () => {
+  useEffect(() => {
+    initGA();
+
+    trackPageView(window.location.pathname + window.location.search);
+
+    const unsubscribe = router.subscribe((state) => {
+      const path = state.location.pathname + state.location.search;
+      trackPageView(path);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <>
       <ProviderBundler providers={[
-        [AuthProvider], 
-        [ThemeProvider, {defaultTheme: "dark", storageKey: "vite-ui-theme"}],
+        [AuthProvider],
+        [ThemeProvider, { defaultTheme: "dark", storageKey: "vite-ui-theme" }],
         [AppLoadingProvider]
       ]}>
         <RouterProvider router={router} />
@@ -60,6 +67,6 @@ const App = () => {
       <Toaster />
     </>
   );
-}
+};
 
 export default App;

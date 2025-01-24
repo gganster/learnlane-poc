@@ -1,5 +1,5 @@
 import { useAuth } from "@/components/auth-provider";
-import {useRef, useEffect, useState} from "react";
+import { useRef, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogClose, DialogDescription, DialogHeader, DialogTrigger, DialogContent, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -8,10 +8,15 @@ import { Link } from "react-router-dom";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { getRoomsBatch } from "@/services/room";
+import usePing from "@/hooks/usePing";
 
 const Room = () => {
   const { auth } = useAuth();
-  const [rooms, setRooms] = useState([]);
+  const [ rooms, setRooms ] = useState([]);
+
+  if(auth.isConnected) {
+    usePing(auth.user.uid);
+  }
 
   useEffect(() => {
     (async () => {
